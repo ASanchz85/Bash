@@ -39,12 +39,6 @@ function helpPanel(){
 	echo -e "\t${yellowColor}h)${endColor} ${grayColor}Mostrar panel de ayuda${endColor}"
 }
 
-function searchMachine(){
-	machineName="$1"
-
-	echo "$machineName"
-}
-
 function updateFiles(){
 #ocultar cursor
 tput civis
@@ -73,6 +67,14 @@ tput civis
 			fi
 	fi
 tput cnorm
+}
+
+function searchMachine(){
+	machineName="$1"
+
+	echo -e "\n${yellowColor}[+]${endColor} Listando propiedades de la máquina ${cyanColor}$machineName${endColor}:\n"
+
+	cat bundle.js | awk "/name: \"$machineName\"/,/resuelta:/" | grep -vE "id:|sku:|resuelta" | tr -d '"' | tr -d ',' | sed 's/^ *//'
 }
 
 # Indicadores
