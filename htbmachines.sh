@@ -33,13 +33,13 @@ main_url="https://htbmachines.github.io/bundle.js"
 
 
 function helpPanel(){
-	echo -e "\n${yellowColor}[+]${endColor}${grayColor} Uso: ${endColor}"
+	echo -e "\n${yellowColor}[+]${endColor}${purpleColor} OPCIONES: ${endColor}"
 	echo -e "\t${yellowColor}u)${endColor} ${grayColor}Descargar o actualizar archivos necesarios${endColor}"
 	echo -e "\t${yellowColor}m)${endColor} ${grayColor}Buscar por un nombre de máquina${endColor}"
 	echo -e "\t${yellowColor}i)${endColor} ${grayColor}Buscar por dirección IP${endColor}"
-	echo -e "\t${yellowColor}d)${endColor} ${grayColor}Filtrar por dificultad (Fácil, Media, Difícil, Insane)${endColor}"
-	echo -e "\t${yellowColor}y)${endColor} ${grayColor}Obtener link de la resolución de la máquina en Youtube${endColor}"
-	echo -e "\t${yellowColor}h)${endColor} ${grayColor}Mostrar panel de ayuda${endColor}"
+	echo -e "\t${yellowColor}d)${endColor} ${grayColor}Filtrar por dificultad (${cyanColor}Fácil, Media, Difícil, Insane${endColor})"
+	echo -e "\t${yellowColor}y)${endColor} ${grayColor}Obtener link de la resolución de la máquina en ${endColor}${cyanColor}Youtube${endColor}"
+	echo -e "\t${yellowColor}h)${endColor} ${grayColor}Mostrar panel de ${endColor}${cyanColor}ayuda${endColor}"
 }
 
 function updateFiles(){
