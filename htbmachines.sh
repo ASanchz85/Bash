@@ -36,6 +36,7 @@ function helpPanel(){
 	echo -e "\n${yellowColor}[+]${endColor}${grayColor} Uso: ${endColor}"
 	echo -e "\t${yellowColor}u)${endColor} ${grayColor}Descargar o actualizar archivos necesarios${endColor}"
 	echo -e "\t${yellowColor}m)${endColor} ${grayColor}Buscar por un nombre de máquina${endColor}"
+	echo -e "\t${yellowColor}i)${endColor} ${grayColor}Buscar por dirección IP${endColor}"
 	echo -e "\t${yellowColor}h)${endColor} ${grayColor}Mostrar panel de ayuda${endColor}"
 }
 
