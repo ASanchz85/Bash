@@ -37,6 +37,8 @@ function helpPanel(){
 	echo -e "\t${yellowColor}u)${endColor} ${grayColor}Descargar o actualizar archivos necesarios${endColor}"
 	echo -e "\t${yellowColor}m)${endColor} ${grayColor}Buscar por un nombre de máquina${endColor}"
 	echo -e "\t${yellowColor}i)${endColor} ${grayColor}Buscar por dirección IP${endColor}"
+	echo -e "\t${yellowColor}d)${endColor} ${grayColor}Filtrar por dificultad (Fácil, Media, Difícil, Insane)${endColor}"
+	echo -e "\t${yellowColor}y)${endColor} ${grayColor}Obtener link de la resolución de la máquina en Youtube${endColor}"
 	echo -e "\t${yellowColor}h)${endColor} ${grayColor}Mostrar panel de ayuda${endColor}"
 }
 
@@ -73,18 +75,68 @@ tput cnorm
 function searchMachine(){
 	machineName="$1"
 
-	echo -e "\n${yellowColor}[+]${endColor} Listando propiedades de la máquina ${cyanColor}$machineName${endColor}:\n"
+	machineChecker="$(cat bundle.js | awk "/name: \"$machineName\"/,/resuelta:/" | grep -vE "id:|sku:|resuelta" | tr -d '"' | tr -d ',' | sed 's/^ *//')"
+	
+	if [ "$machineChecker" ]; then
 
-	cat bundle.js | awk "/name: \"$machineName\"/,/resuelta:/" | grep -vE "id:|sku:|resuelta" | tr -d '"' | tr -d ',' | sed 's/^ *//'
+		echo -e "\n${yellowColor}[+]${endColor} Listando propiedades de la máquina ${cyanColor}$machineName${endColor}:\n"
+		cat bundle.js | awk "/name: \"$machineName\"/,/resuelta:/" | grep -vE "id:|sku:|resuelta" | tr -d '"' | tr -d ',' | sed 's/^ *//'
+
+	else
+		echo -e "\n${redColor}[!] La máquina que buscas no existe${endColor}\n"
+	fi
+}
+
+function searchIP(){
+	ipAddress="$1"
+
+	machineName="$(cat bundle.js | grep "ip: \"$ipAddress\"" -B 3 | grep "name: " | awk '{print $NF}' | tr -d '"' | tr -d ',')"
+
+	if [ "$machineName" ]; then
+		echo -e "\n${yellowColor}[+]${endColor} La máquina que coincide con la IP ${cyanColor}$ipAddress${endColor} es ${redColor}$machineName${endColor}:"
+		searchMachine $machineName
+	else
+		echo -e "\n${redColor}[!] La máquina que buscas no existe${endColor}\n"
+	fi
+}
+
+function getYoutubeLink(){
+	machineName="$1"
+
+	YTLink="$(cat bundle.js | awk "/name: \"$machineName\"/,/resuelta:/" | grep -vE "id:|sku:|resuelta:" | tr -d '"' | tr -d ',' | sed 's/^ *//' | grep youtube | awk '{print $NF}')"
+
+	if [ $YTLink ]; then
+		echo -e "\n${yellowColor}[+]${endColor} El video de la maquina ${cyanColor}$machineName${endColor} es ${redColor}$YTLink${endColor}"
+		echo -e "\t${yellowColor}[?]${endColor}${grayColor} Tip: Pulsa Ctrl + clic derecho${endColor} ${yellowColor}[?]${endColor}"
+	else
+		echo -e "\n${redColor}[!] La máquina que buscas no existe${endColor}\n"
+	fi
+}
+
+function filterByDifficulty(){
+	difficulty="$1"
+# TO DO: incluir filtrado para acentos
+	machineDifficulty="$(cat bundle.js | grep -i "dificultad: \"$difficulty\"" -B 5 | grep name | awk '{print $NF}' | tr -d '"' | tr -d ',' | column)"
+
+	if [ "$machineDifficulty" ]; then
+		echo -e "\n${yellowColor}[+]${endColor} El listado de máquinas con dificultad ${cyanColor}$difficulty${endColor} son:"
+		cat bundle.js | grep -i "dificultad: \"$difficulty\"" -B 5 | grep name | awk '{print $NF}' | tr -d '"' | tr -d ',' | column
+	else
+		echo -e "\n${redColor}[!] No hay máquinas para la dificultad elegida${endColor}\n"
+		echo -e "\t${yellowColor}[?]${endColor}${grayColor} Tip: prueba a elegir entre Fácil, Media, Difícil e Insane${endColor} ${yellowColor}[?]${endColor}"
+	fi
 }
 
 # Indicadores
 declare -i parameter_counter=0
 
-while getopts "m:uh" arg; do
+while getopts "m:ui:y:d:h" arg; do
 	case $arg in
-		m) machineName=$OPTARG; let parameter_counter+=1;;
+		m) machineName="$OPTARG"; let parameter_counter+=1;;
 		u) let parameter_counter+=2;;
+		i) ipAddress="$OPTARG"; let parameter_counter+=3;;
+		y) machineName="$OPTARG"; let parameter_counter+=4;;
+		d) difficulty="$OPTARG"; let parameter_counter+=5;;
 		h) ;;
 	esac
 done
@@ -93,6 +145,12 @@ if [ $parameter_counter -eq 1 ]; then
 	searchMachine $machineName
 elif [ $parameter_counter -eq 2 ]; then
 	updateFiles
+elif [ $parameter_counter -eq 3 ]; then
+	searchIP $ipAddress
+elif [ $parameter_counter -eq 4 ]; then
+	getYoutubeLink $machineName
+elif [ $parameter_counter -eq 5 ]; then
+	filterByDifficulty $difficulty
 else
 	helpPanel
 fi
